@@ -5,8 +5,9 @@ import { Toaster } from "@/components/ui/sonner";
 import CoreSchedDashboard from "@/components/CoreSchedDashboard";
 import HyperText from "@/components/ui/hyper-text";
 import Particles from "@/components/ui/particles";
+import LandingPage from "@/components/LandingPage";
 
-function Home() {
+function Home({ onBack }) {
   const { theme } = useTheme();
   const [color, setColor] = useState("#ffffff");
 
@@ -17,7 +18,11 @@ function Home() {
   return (
     <div className="container max-w-full">
       <main className="flex flex-col justify-center sm:items-start p-5 grow-0">
-        <div className="w-full flex justify-center pb-5">
+        <div 
+          className="w-full flex justify-center pb-5 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={onBack}
+          title="Back to Landing Page"
+        >
           <HyperText
             className="md:text-4xl text-center font-bold text-black dark:text-white"
             text="CoreSched Simulator"
@@ -39,15 +44,27 @@ function Home() {
 }
 
 export default function App() {
+  const [showSimulator, setShowSimulator] = useState(false);
+
   return (
     <div className="flex flex-col min-h-screen">
-      <ThemeProvider defaultTheme="dark" enableSystem>
-        <main className="flex-grow">
-          <Home />
-        </main>
-        <Toaster richColors position="top-center" />
-      </ThemeProvider>
+      {showSimulator ? (
+        <ThemeProvider defaultTheme="dark" enableSystem>
+          <main className="flex-grow">
+            <Home onBack={() => setShowSimulator(false)} />
+          </main>
+          <Toaster richColors position="top-center" />
+        </ThemeProvider>
+      ) : (
+        <ThemeProvider defaultTheme="dark" enableSystem>
+          <main className="flex-grow">
+            <LandingPage onLaunch={() => setShowSimulator(true)} />
+          </main>
+          <Toaster richColors position="top-center" />
+        </ThemeProvider>
+      )}
       <Footer />
     </div>
   );
 }
+
