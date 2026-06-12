@@ -679,7 +679,7 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
           hasCycle ? "bg-red-500/20 text-red-400" : "bg-emerald-500/20 text-emerald-400"
         }`}>
-          {hasCycle ? "⚠️ Deadlock Detected" : "✅ No Deadlock"}
+          {hasCycle ? "⚠️ Deadlock Detected" : " No Deadlock"}
         </span>
       </div>
 
