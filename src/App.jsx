@@ -1,4 +1,5 @@
 import { Suspense, useState, useEffect } from "react";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import Footer from "@/components/footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -7,9 +8,10 @@ import HyperText from "@/components/ui/hyper-text";
 import Particles from "@/components/ui/particles";
 import LandingPage from "@/components/LandingPage";
 
-function Home({ onBack }) {
+function Home() {
   const { theme } = useTheme();
   const [color, setColor] = useState("#ffffff");
+  const navigate = useNavigate();
 
   useEffect(() => {
     setColor(theme === "dark" ? "#ffffff" : "#000000");
@@ -20,7 +22,7 @@ function Home({ onBack }) {
       <main className="flex flex-col justify-center sm:items-start p-5 grow-0">
         <div 
           className="w-full flex justify-center pb-5 cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={onBack}
+          onClick={() => navigate("/")}
           title="Back to Landing Page"
         >
           <HyperText
@@ -44,25 +46,20 @@ function Home({ onBack }) {
 }
 
 export default function App() {
-  const [showSimulator, setShowSimulator] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col min-h-screen">
-      {showSimulator ? (
-        <ThemeProvider defaultTheme="dark" enableSystem>
-          <main className="flex-grow">
-            <Home onBack={() => setShowSimulator(false)} />
-          </main>
-          <Toaster richColors position="top-center" />
-        </ThemeProvider>
-      ) : (
-        <ThemeProvider defaultTheme="dark" enableSystem>
-          <main className="flex-grow">
-            <LandingPage onLaunch={() => setShowSimulator(true)} />
-          </main>
-          <Toaster richColors position="top-center" />
-        </ThemeProvider>
-      )}
+      <ThemeProvider defaultTheme="dark" enableSystem>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<LandingPage onLaunch={() => navigate("/simulator")} />} />
+            <Route path="/simulator" element={<Home />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <Toaster richColors position="top-center" />
+      </ThemeProvider>
       <Footer />
     </div>
   );
