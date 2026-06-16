@@ -1,9 +1,9 @@
 # CoreSched Simulator
 
-Vite version: 5.4.11
-React version: 18
-Tailwind CSS version: 3.4
-Framer Motion version: 11.11
+[![Vite](https://img.shields.io/badge/Vite-5.4.11-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-11.11-F08?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
 
 CoreSched is an interactive, modern web-based operating system simulator. It is designed to visualize and demonstrate core OS scheduler concepts, thread lifecycles, priority-based preemptive execution, workload balancing, resource locks, deadlock occurrences, and CPU state context rollbacks.
 
