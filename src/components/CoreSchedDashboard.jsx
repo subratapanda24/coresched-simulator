@@ -34,18 +34,20 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import AnimatedShinyText from "@/components/ui/animated-shiny-text";
-import { Dices, Play, Pause, SkipForward, Undo2, RotateCcw, Plus, Search, Lock, Unlock, AlertTriangle, CheckCircle2 } from "lucide-react";
+import {
+  Play, Pause, SkipForward, Undo2, RotateCcw, Plus, Search,
+  Lock, Unlock, AlertTriangle, CheckCircle2,
+  Cpu, ListChecks, Clock, Shield, ArrowUpDown, Grid3X3, Zap, History,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-/* ------------------------------------------------------------------ */
-/*  Status + Priority helpers                                          */
-/* ------------------------------------------------------------------ */
+// Color helpers
 
 const STATUS_COLORS = {
-  running:    { bg: "hsl(142, 71%, 45%)", label: "Running" },
-  ready:      { bg: "hsl(48, 96%, 53%)",  label: "Ready" },
-  waiting:    { bg: "hsl(217, 91%, 60%)", label: "Waiting" },
+  running:    { bg: "", label: "Running" },
+  ready:      { bg: "hsl(142, 71%, 45%)",  label: "Ready" },
+  waiting:    { bg: "", label: "Waiting" },
   blocked:    { bg: "hsl(0, 84%, 60%)",   label: "Blocked" },
   terminated: { bg: "hsl(0, 0%, 45%)",    label: "Terminated" },
 };
@@ -56,16 +58,23 @@ function priorityColor(p) {
   return "hsl(142, 71%, 45%)";
 }
 
-function generateRandomColor() {
-  const hue = Math.floor(Math.random() * 360);
-  const saturation = 60 + Math.floor(Math.random() * 40);
-  const lightness = 50 + Math.floor(Math.random() * 20);
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+// Darker badges
+function priorityBgColor(p) {
+  if (p <= 3) return "hsl(0, 70%, 42%)";
+  if (p <= 6) return "hsl(40, 70%, 38%)";
+  return "hsl(142, 60%, 35%)";
 }
 
-/* ================================================================== */
-/*  MAIN DASHBOARD                                                     */
-/* ================================================================== */
+// Feature badge
+function FeatureBadge({ label }) {
+  return (
+    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/[0.06] text-sm font-bold border border-white/[0.08] text-muted-foreground shrink-0 font-mono">
+      {label}
+    </span>
+  );
+}
+
+// Dashboard
 
 export default function CoreSchedDashboard() {
   const sim = useSimulation(2);
@@ -100,25 +109,21 @@ export default function CoreSchedDashboard() {
     [tasks]
   );
 
-  const hasResults = true;
-
   return (
     <div className="grid grid-cols-2 w-full max-w-full space-y-5 md:space-y-0 overflow-hidden justify-items-center">
 
-      {/* ============================================================ */}
-      {/*  LEFT COLUMN — Controls                                       */}
-      {/* ============================================================ */}
+      {/* Left column */}
       <div className="row-span-2 col-span-2 md:col-span-1 max-w-full md:pl-14 flex flex-col items-center px-4">
         <div className="md:max-w-[320px] border p-4 rounded-xl space-y-4">
 
-          {/* Simulation Controls */}
+          {/* Control simulator */}
           <div>
             <Label className="text-sm font-medium">Simulation Controls</Label>
             <p className="text-sm text-muted-foreground mb-3">
               Control the CPU thread scheduler simulation.
             </p>
 
-            {/* Playback Buttons */}
+            {/* Play buttons */}
             <div className="flex gap-2 mb-3">
               <Button
                 id="btn-play-pause"
@@ -139,17 +144,21 @@ export default function CoreSchedDashboard() {
               </Button>
             </div>
 
-            {/* Speed */}
+            {/* Speed slider */}
             <div className="space-y-1 mb-3">
               <Label className="text-xs text-muted-foreground">Speed: {speed}ms / tick</Label>
               <input
-                type="range" min="50" max="2000" step="50" value={speed}
+                type="range" min="50" max="3000" step="50" value={speed}
                 onChange={(e) => setSpeed(Number(e.target.value))}
                 className="w-full h-1.5 accent-white cursor-pointer"
               />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>Fast</span>
+                <span>Slow</span>
+              </div>
             </div>
 
-            {/* Cores */}
+            {/* Core selector */}
             <div className="space-y-1 mb-3">
               <Label className="text-xs">CPU Cores</Label>
               <Select value={String(cores)} onValueChange={(v) => setCores(Number(v))}>
@@ -163,7 +172,7 @@ export default function CoreSchedDashboard() {
               </Select>
             </div>
 
-            {/* Current Tick */}
+            {/* Current tick */}
             <div className="text-center p-3 bg-muted rounded-md">
               <p className="text-xs text-muted-foreground">Current Tick</p>
               <motion.p
@@ -177,11 +186,15 @@ export default function CoreSchedDashboard() {
             </div>
           </div>
 
-          {/* Task ID Checker */}
+          {/* ID checker */}
           <div className="pt-2 border-t">
-            <Label className="text-sm font-medium">Task ID Checker</Label>
+            <div className="flex items-center gap-2 mb-1">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-sm font-medium">Task ID Checker</Label>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">Feature d</span>
+            </div>
             <p className="text-sm text-muted-foreground mb-2">
-              Verify a security ID instantly (O(1) lookup).
+              Verify a security ID instantly (O(1) HashMap lookup).
             </p>
             <div className="relative mb-2">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -230,9 +243,7 @@ export default function CoreSchedDashboard() {
         </div>
       </div>
 
-      {/* ============================================================ */}
-      {/*  RIGHT COLUMN — Task List                                     */}
-      {/* ============================================================ */}
+      {/* Right column */}
       <Card className="md:w-[500px] w-full max-w-full col-span-2 md:col-span-1 mx-4">
         <CardHeader>
           <div className="flex items-start justify-between">
@@ -272,30 +283,27 @@ export default function CoreSchedDashboard() {
             </Popover>
           </div>
         </CardHeader>
-        <CardContent className="grid gap-4 w-full">
-          <div className="flex justify-start flex-wrap md:max-w-[500px]">
-            {tasks.map((task, index) => (
-              <div key={task.id} className="flex items-center justify-between space-x-4 p-2">
-                <div className="flex items-center space-x-4">
-                  <div
-                    className="preview flex justify-center items-center p-1 h-[50px] w-[50px] rounded !bg-cover !bg-center transition-all"
-                    style={{
-                      background: task.color,
-                      textShadow: "0 1px 3px rgba(0, 0, 0, 0.7)",
-                    }}
-                  >
-                    <span className="text-white text-[10px] font-bold">{task.id}</span>
-                  </div>
-                  <div className="pt-1">
-                    <p className="text-sm font-medium leading-none">{task.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Priority: {task.priority} • Burst: {task.burstRemaining}/{task.burstTotal}
-                    </p>
-                    <p className="text-xs" style={{ color: STATUS_COLORS[task.status]?.bg }}>
-                      {STATUS_COLORS[task.status]?.label}
-                      {task.coreId !== null && task.coreId !== undefined ? ` (Core ${task.coreId})` : ""}
-                    </p>
-                  </div>
+        <CardContent className="grid gap-3 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full">
+            {tasks.map((task) => (
+              <div key={task.id} className="flex items-center gap-2 p-1.5 rounded-lg border border-transparent hover:border-white/[0.06] transition-colors">
+                <div
+                  className={`shrink-0 flex justify-center items-center h-[36px] w-[36px] rounded transition-all ${task.status === "running" ? "live-pulse" : ""}`}
+                  style={{
+                    background: task.color,
+                    textShadow: "0 1px 3px rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  <span className="text-white text-[8px] font-bold">{task.id}</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium leading-tight truncate">{task.name}</p>
+                  <p className="text-[10px] text-muted-foreground">P{task.priority} • {task.burstRemaining}/{task.burstTotal}t</p>
+                  <p className="text-[10px] flex items-center gap-1" style={{ color: STATUS_COLORS[task.status]?.bg }}>
+                    {task.status === "running" && <span className="inline-block w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />}
+                    {STATUS_COLORS[task.status]?.label}
+                    {task.coreId !== null && task.coreId !== undefined ? ` C${task.coreId}` : ""}
+                  </p>
                 </div>
               </div>
             ))}
@@ -317,85 +325,79 @@ export default function CoreSchedDashboard() {
         </CardContent>
       </Card>
 
-      {/* ============================================================ */}
-      {/*  RESULTS SECTION — All 8 Features in Tabs                     */}
-      {/* ============================================================ */}
-      {hasResults && (
-        <div ref={resultsRef} className="col-span-2 flex flex-col items-center w-full px-4 space-y-6 mt-10">
+      {/* Results section */}
+      <div ref={resultsRef} className="col-span-2 flex flex-col items-center w-full px-4 space-y-6 mt-10">
 
-          {/* Workload Balancer — Visual Bar (like Gantt Chart) */}
-          <Card className="w-full max-w-5xl">
-            <CardHeader>
-              <CardTitle>CPU Workload Balancer</CardTitle>
-              <CardDescription>Real-time CPU core utilization and load distribution</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <WorkloadBars coreLoads={coreLoads} tasks={tasks} />
-            </CardContent>
-          </Card>
+        {/* Workload balancer */}
+        <Card className="w-full max-w-5xl">
+          <CardHeader>
+            <CardTitle>CPU Workload Balancer</CardTitle>
+            <CardDescription>Real-time CPU core utilization and load distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <WorkloadBars coreLoads={coreLoads} tasks={tasks} />
+          </CardContent>
+        </Card>
 
-          {/* Tabbed Feature Panels */}
-          <Card className="w-full max-w-5xl mb-10">
-            <CardContent className="pt-6">
-              <Tabs defaultValue="status" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 mb-6">
-                  <TabsTrigger value="status">Status</TabsTrigger>
-                  <TabsTrigger value="queue">Queue</TabsTrigger>
-                  <TabsTrigger value="priority">Priority</TabsTrigger>
-                  <TabsTrigger value="locks">Locks</TabsTrigger>
-                  <TabsTrigger value="deadlock">Deadlock</TabsTrigger>
-                  <TabsTrigger value="undo">Undo</TabsTrigger>
-                  <TabsTrigger value="stats">Stats</TabsTrigger>
-                </TabsList>
+        {/* Feature panels */}
+        <Card className="w-full max-w-5xl mb-10">
+          <CardContent className="pt-6">
+            <Tabs defaultValue="status" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 mb-6">
+                <TabsTrigger value="status">Status</TabsTrigger>
+                <TabsTrigger value="queue">Queue</TabsTrigger>
+                <TabsTrigger value="priority">Priority</TabsTrigger>
+                <TabsTrigger value="locks">Locks</TabsTrigger>
+                <TabsTrigger value="deadlock">Deadlock</TabsTrigger>
+                <TabsTrigger value="undo">Undo</TabsTrigger>
+                <TabsTrigger value="stats">Stats</TabsTrigger>
+              </TabsList>
 
-                {/* Tab: Task Status Table */}
-                <TabsContent value="status">
-                  <TaskStatusTable tasks={tasks} />
-                </TabsContent>
+              {/* Status table */}
+              <TabsContent value="status">
+                <TaskStatusTable tasks={tasks} />
+              </TabsContent>
 
-                {/* Tab: Ready Queue */}
-                <TabsContent value="queue">
-                  <ReadyQueueView readyQueue={readyQueue} />
-                </TabsContent>
+              {/* Ready queue */}
+              <TabsContent value="queue">
+                <ReadyQueueView readyQueue={readyQueue} />
+              </TabsContent>
 
-                {/* Tab: Priority Sorter */}
-                <TabsContent value="priority">
-                  <PrioritySortView priorityQueue={priorityQueue} />
-                </TabsContent>
+              {/* Priority sorter */}
+              <TabsContent value="priority">
+                <PrioritySortView priorityQueue={priorityQueue} />
+              </TabsContent>
 
-                {/* Tab: Resource Lock Map */}
-                <TabsContent value="locks">
-                  <ResourceLocksView resourceLocks={resourceLocks} tasks={tasks} />
-                </TabsContent>
+              {/* Lock map */}
+              <TabsContent value="locks">
+                <ResourceLocksView resourceLocks={resourceLocks} tasks={tasks} />
+              </TabsContent>
 
-                {/* Tab: Deadlock Finder */}
-                <TabsContent value="deadlock">
-                  <DeadlockView deadlockAnalysis={deadlockAnalysis} tasks={tasks} />
-                </TabsContent>
+              {/* Deadlock finder */}
+              <TabsContent value="deadlock">
+                <DeadlockView deadlockAnalysis={deadlockAnalysis} tasks={tasks} />
+              </TabsContent>
 
-                {/* Tab: CPU State Undo */}
-                <TabsContent value="undo">
-                  <UndoHistoryView stateHistory={stateHistory} onRestore={restoreState} />
-                </TabsContent>
+              {/* Undo history */}
+              <TabsContent value="undo">
+                <UndoHistoryView stateHistory={stateHistory} onRestore={restoreState} />
+              </TabsContent>
 
-                {/* Tab: Summary Stats */}
-                <TabsContent value="stats">
-                  <SummaryStatsView tasks={tasks} coreLoads={coreLoads} currentTick={currentTick} />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+              {/* Summary stats */}
+              <TabsContent value="stats">
+                <SummaryStatsView tasks={tasks} coreLoads={coreLoads} currentTick={currentTick} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
 
-/* ================================================================== */
-/*  SUB-COMPONENTS (styled to match original project)                  */
-/* ================================================================== */
+// Subcomponents
 
-/* --- Workload Bars (replaces Gantt chart visual) ------------------- */
+// Workload bars
 function WorkloadBars({ coreLoads, tasks }) {
   const totalCapacity = coreLoads.length * 100;
   const totalUtil = coreLoads.reduce((s, c) => s + (c.utilization || 0), 0);
@@ -454,7 +456,7 @@ function WorkloadBars({ coreLoads, tasks }) {
   );
 }
 
-/* --- Task Status Table --------------------------------------------- */
+// Status table
 function TaskStatusTable({ tasks }) {
   const activeTasks = tasks.filter((t) => t.status !== "terminated");
   const terminated = tasks.filter((t) => t.status === "terminated");
@@ -494,7 +496,7 @@ function TaskStatusTable({ tasks }) {
                 </TableCell>
                 <TableCell className="text-center">
                   <span className="inline-block w-6 h-6 rounded text-xs font-bold leading-6 text-white text-center"
-                    style={{ backgroundColor: priorityColor(task.priority) }}>
+                    style={{ backgroundColor: priorityBgColor(task.priority) }}>
                     {task.priority}
                   </span>
                 </TableCell>
@@ -522,14 +524,10 @@ function TaskStatusTable({ tasks }) {
   );
 }
 
-/* --- Ready Queue View ---------------------------------------------- */
+// Ready queue
 function ReadyQueueView({ readyQueue }) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-6">
-      <h3 className="text-lg font-semibold mb-2">Task Waiting Line (FIFO Queue)</h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        Tasks lined up in the exact order they requested execution.
-      </p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       {readyQueue.length === 0 ? (
         <div className="text-center py-10 text-muted-foreground text-sm border rounded-xl">
           Queue is empty — no tasks waiting
@@ -549,7 +547,7 @@ function ReadyQueueView({ readyQueue }) {
             >
               <span className="text-xs font-bold">{task.id}</span>
               <span className="text-xs text-muted-foreground">{task.name}</span>
-              <span className="text-[10px] mt-1" style={{ color: priorityColor(task.priority) }}>
+              <span className="text-[10px] mt-1 text-muted-foreground">
                 Priority {task.priority} • {task.burstRemaining}t
               </span>
             </motion.div>
@@ -560,7 +558,7 @@ function ReadyQueueView({ readyQueue }) {
   );
 }
 
-/* --- Priority Sort View -------------------------------------------- */
+// Priority sort
 function PrioritySortView({ priorityQueue }) {
   const active = priorityQueue.filter((t) => t.status !== "terminated");
 
@@ -588,14 +586,20 @@ function PrioritySortView({ priorityQueue }) {
               <TableCell className="text-center text-xs">{task.name}</TableCell>
               <TableCell className="text-center">
                 <span className="inline-block w-6 h-6 rounded text-xs font-bold leading-6 text-white text-center"
-                  style={{ backgroundColor: priorityColor(task.priority) }}>{task.priority}</span>
+                  style={{ backgroundColor: priorityBgColor(task.priority) }}>{task.priority}</span>
               </TableCell>
               <TableCell className="text-center">
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-medium text-white"
                   style={{ backgroundColor: STATUS_COLORS[task.status]?.bg }}>{STATUS_COLORS[task.status]?.label}</span>
               </TableCell>
-              <TableCell className="text-center text-xs">
-                {task.priority <= 3 ? "🔴 Critical" : task.priority <= 6 ? "🟡 Medium" : "🟢 Low"}
+              <TableCell className="text-center">
+                {task.priority <= 3 ? (
+                  <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-semibold bg-red-500/20 text-red-400 border border-red-500/30">Critical</span>
+                ) : task.priority <= 6 ? (
+                  <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">Medium</span>
+                ) : (
+                  <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Low</span>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -612,7 +616,7 @@ function PrioritySortView({ priorityQueue }) {
   );
 }
 
-/* --- Resource Locks View ------------------------------------------- */
+// Resource locks
 function ResourceLocksView({ resourceLocks, tasks }) {
   if (!resourceLocks?.resources) return <div className="text-center py-10 text-muted-foreground text-sm">No lock data</div>;
 
@@ -653,7 +657,7 @@ function ResourceLocksView({ resourceLocks, tasks }) {
   );
 }
 
-/* --- Deadlock Finder View ------------------------------------------ */
+// Deadlock view
 function DeadlockView({ deadlockAnalysis, tasks }) {
   const graph = deadlockAnalysis?.graph || { nodes: [], edges: [] };
   const hasCycle = deadlockAnalysis?.hasCycle || false;
@@ -663,7 +667,7 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
   const taskColorMap = {};
   tasks.forEach((t) => { taskColorMap[t.id] = t.color; });
 
-  // Circular SVG layout
+  // SVG layout
   const count = graph.nodes.length;
   const cx = 120, cy = 100, r = 70;
   const pos = {};
@@ -673,9 +677,9 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
   });
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Deadlock Analysis</h3>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      {/* Status badge */}
+      <div className="flex justify-end mb-4">
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
           hasCycle ? "bg-red-500/20 text-red-400" : "bg-emerald-500/20 text-emerald-400"
         }`}>
@@ -683,8 +687,8 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Graph */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Draw graph */}
         <div className="border rounded-xl p-4">
           <p className="text-xs text-muted-foreground mb-2 font-medium">Wait-For Graph</p>
           {graph.nodes.length === 0 ? (
@@ -718,7 +722,7 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
           )}
         </div>
 
-        {/* Release Order */}
+        {/* Release order */}
         <div className="border rounded-xl p-4">
           <p className="text-xs text-muted-foreground mb-2 font-medium">Optimal Release Order (Topological Sort)</p>
           {releaseOrder.length === 0 ? (
@@ -744,7 +748,7 @@ function DeadlockView({ deadlockAnalysis, tasks }) {
   );
 }
 
-/* --- Undo History View --------------------------------------------- */
+// Undo history
 function UndoHistoryView({ stateHistory, onRestore }) {
   const reversed = [...stateHistory].reverse();
 
@@ -798,7 +802,7 @@ function UndoHistoryView({ stateHistory, onRestore }) {
   );
 }
 
-/* --- Summary Stats View -------------------------------------------- */
+// Summary stats
 function SummaryStatsView({ tasks, coreLoads, currentTick }) {
   const active = tasks.filter((t) => t.status !== "terminated").length;
   const terminated = tasks.filter((t) => t.status === "terminated").length;

@@ -2,7 +2,7 @@ import React from "react";
 import { Cpu, Sliders, Lock } from "lucide-react";
 import CardSwap, { Card } from "./CardSwap";
 
-// Inline Button Component
+// Button
 const Button = React.forwardRef(
   ({ variant = "default", size = "default", className = "", children, ...props }, ref) => {
     const baseStyles = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -90,7 +90,7 @@ const X = ({ className = "", size = 24 }) => (
   </svg>
 );
 
-// Navigation Component
+// Navigation
 const Navigation = React.memo(({ onLaunch }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -191,7 +191,7 @@ const Navigation = React.memo(({ onLaunch }) => {
 
 Navigation.displayName = "Navigation";
 
-// Hero Component
+// Hero
 const Hero = React.memo(({ onLaunch }) => {
   return (
     <section
@@ -200,7 +200,7 @@ const Hero = React.memo(({ onLaunch }) => {
         animation: "fadeIn 0.6s ease-out"
       }}
     >
-      {/* Glow backdrop behind cards, anchored to the hero layout */}
+      {/* Glow backdrop */}
       <div
         className="absolute left-1/2 w-[90%] max-w-5xl pointer-events-none z-0"
         style={{
@@ -246,7 +246,7 @@ const Hero = React.memo(({ onLaunch }) => {
         }
       `}</style>
 
-      {/* Top Hero Content Group */}
+      {/* Top content */}
       <div className="flex flex-col items-center text-center z-10 w-full max-w-3xl">
         <aside className="mb-6 inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full border border-gray-700 bg-gray-800/50 backdrop-blur-sm max-w-full">
           <span className="text-xs text-center whitespace-nowrap" style={{ color: '#9ca3af' }}>
@@ -280,7 +280,7 @@ const Hero = React.memo(({ onLaunch }) => {
           An interactive visualization engine for multi-core scheduling, priority queues, <br />state rollback, and deadlock detection.
         </p>
 
-        {/* Button with soft yellow reflection/glow shade directly below it */}
+        {/* Action button */}
         <div className="flex items-center gap-4 relative z-10 mb-4">
           <div className="relative">
             <Button
@@ -293,16 +293,16 @@ const Hero = React.memo(({ onLaunch }) => {
             >
               Launch Simulator
             </Button>
-            {/* Subtle yellow shade casting below the button */}
+            {/* Button shade */}
             <div className="absolute left-1/2 top-full -translate-x-1/2 mt-1 w-36 h-5 bg-yellow-500/25 rounded-full blur-xl pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* Bottom section with left-side panel and centric-right CardSwap */}
+      {/* Bottom panel */}
       <div className="w-full max-w-5xl relative pb-0 mt-0 mx-auto flex flex-col md:flex-row items-center justify-between gap-16 px-6 z-10">
         
-        {/* Left Column: Technical Description */}
+        {/* Left details */}
         <div className="relative z-10 flex-1 text-left max-w-[390px] bg-zinc-950/45 p-5 rounded-xl border border-gray-800/80 backdrop-blur-sm">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-gray-500">System Capability</span>
           <h2 className="text-xl font-bold text-white mt-1 mb-2">Simulation Performance</h2>
@@ -325,7 +325,7 @@ const Hero = React.memo(({ onLaunch }) => {
           </ul>
         </div>
 
-        {/* Right Column: CardSwap Deck (centric-right, scaled down in height/width) */}
+        {/* Right deck */}
         <div className="relative z-10 flex-1 w-full h-[290px] flex items-center justify-center md:justify-end select-none">
           <CardSwap
             width={400}
@@ -394,7 +394,7 @@ const Hero = React.memo(({ onLaunch }) => {
 
 Hero.displayName = "Hero";
 
-// Main Landing Page Component
+// Main page
 export default function LandingPage({ onLaunch }) {
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
